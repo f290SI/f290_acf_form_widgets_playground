@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,6 +10,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _controller = TextEditingController();
+  final _controllerDate = TextEditingController();
   var estadoTextField = '';
 
   static List<String> linguagens = [
@@ -24,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   List<String> _linguagensSelecionadas = [];
   bool _estadoSwitch = false;
   double _valorSlider = 0;
+  DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +62,21 @@ class _HomePageState extends State<HomePage> {
             Text(estadoTextField),
 
             //TODO: Coletando valor unico
+            DropdownButton(
+                value: _linguagemSelecionada,
+                isExpanded: true,
+                items: linguagens
+                    .map((l) => DropdownMenuItem(
+                          value: l,
+                          child: Text(l),
+                        ))
+                    .toList(),
+                onChanged: ((value) {
+                  setState(() {
+                    _linguagemSelecionada = value;
+                  });
+                })),
+
             Column(
               children: linguagens
                   .map((l) => ListTile(
@@ -171,9 +189,34 @@ class _HomePageState extends State<HomePage> {
                         });
                       })))
                   .toList(),
-            )
+            ),
 
             // Selecionado Data e Hora
+            TextField(
+              controller: _controllerDate,
+              decoration: InputDecoration(
+                  labelText: 'Data',
+                  hintText: 'Data conclusão de curso',
+                  suffix: IconButton(
+                    icon: const Icon(
+                      Icons.date_range,
+                    ),
+                    onPressed: () {
+                      showDatePicker(
+                        context: context,
+                        initialDate: _selectedDate,
+                        firstDate:
+                            DateTime.now().subtract(const Duration(days: 60)),
+                        lastDate: DateTime.now().add(const Duration(days: 60)),
+                      ).then((selectedDate) {
+                        if (selectedDate != null) {
+                          _selectedDate = selectedDate;
+                          _controllerDate.text = selectedDate.toIso8601String();
+                        }
+                      });
+                    },
+                  )),
+            ),
           ],
         ),
       ),
